@@ -13,16 +13,18 @@ export class Tamagotchi {
   }
 
 
-  //returns bool if needs to eat
+  // returns bool if needs to eat
   hungerCheck(){
-    if(this.hunger < 50){
+    if(this.hunger > 50){
       return true
     } else {
       return false
     }
   }
 
-  healthCheck() {
+
+
+   healthCheck() {
     let health = this.health
     let healthMod = 0
     if (health > 85){
@@ -73,27 +75,33 @@ export class Tamagotchi {
   eggCheck(environ) {
      if (this.egg >= 100) {
        this.egg = 0
-       environ.egg += 1
+       environ.eggs += 1
      }
   }
 
   metabolismCheck(environ) {
-    let toEat = this.hungerCheck()
-    let happy = this.happinessCheck()
-    let health = this.healthCheck()
-    let rest = this.restCheck()
-    let egg = this.eggCheck(environ)
+    let that = this
+    setInterval(function() {
+      let toEat = that.hungerCheck()
+      let happy = that.happinessCheck()
+      let health = that.healthCheck()
+      let rest = that.restCheck()
+      let egg = that.eggCheck(environ)
 
-    if (toEat == true){
-      this.eat(environ)
-    }else if (rest == false){
-      this.sleep()
-    } else {
-      this.metabolism(environ, toEat, happy, health)
-    }
-  }
+      if (toEat == true){
+        that.eat(environ)
+        console.log("eat")
+      }else if (rest == false){
+        that.sleep()
+        console.log("sleep")
+      } else {
+        that.metabolism(environ, happy, health)
+        console.log("met")
+      }
+  }, 1000);
+}
 
-  metabolism(environ,happy,health){
+ metabolism(environ,happy,health){
     this.happiness -= happy
     this.egg += (5 * this.genome[4]) + (happy + health)
     environ.waste += (20 * this.genome[0])
@@ -101,7 +109,7 @@ export class Tamagotchi {
   }
 
 
-  eat(environ){
+ eat(environ){
     let foodNeed = this.level * 5
     let foodAvail = environ.food
     let mealSize = 0
@@ -109,13 +117,13 @@ export class Tamagotchi {
       mealSize = foodAvail
     } else {
     mealSize = foodNeed
-    let eats = Math.floor(Math.random() * (mealSize) + 1)
+    let eats = Math.floor((Math.random() * mealSize) + 1)
     environ.food -= eats
-    this.hunger -= eats * (100/mealSize)
+    this.hunger += eats * (100/mealSize)
     }
   }
 
-  sleep(){
+ sleep(){
     this.hunger -= this.genome[3]
     this.rest += 25 * this.genome[5]
   }
