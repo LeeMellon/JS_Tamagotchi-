@@ -1,5 +1,5 @@
 export class Tamagotchi {
-  constructor(name, true, true, 100, 0, 100, 0, 0, 100, 1){
+  constructor(name, alive = true, awake = true,health = 100,hunger = 0, happiness =100,train = 0, egg = 0, rest = 100, level  = 1){
     this.name = name
     this.alive = alive
     this.awake = awake
@@ -82,16 +82,14 @@ export class Tamagotchi {
     let happy = this.happinessCheck()
     let health = this.healthCheck()
     let rest = this.restCheck()
-    let egg = this.eggCheck()
+    let egg = this.eggCheck(environ)
 
     if (toEat == true){
       this.eat(environ)
-    }else if {
-      if (rest == false)
+    }else if (rest == false){
       this.sleep()
     } else {
-      this.metabolism(environ, toEat, happy, health){
-      }
+      this.metabolism(environ, toEat, happy, health)
     }
   }
 
@@ -110,13 +108,12 @@ export class Tamagotchi {
     if (foodNeed > foodAvail){
       mealSize = foodAvail
     } else {
-      mealSize = foodNeed
-    }
-    let eats = Math.floor( Math.random() * (mealSize) + 1
+    mealSize = foodNeed
+    let eats = Math.floor(Math.random() * (mealSize) + 1)
     environ.food -= eats
     this.hunger -= eats * (100/mealSize)
+    }
   }
-
 
   sleep(){
     this.hunger -= this.genome[3]
