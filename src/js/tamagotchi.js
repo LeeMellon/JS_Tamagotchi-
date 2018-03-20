@@ -22,12 +22,12 @@ export class Tamagotchi {
     }
   }
 
-
-
    healthCheck() {
     let health = this.health
     let healthMod = 0
-    if (health > 85){
+    if (health >= 100) {
+      this.health = 100
+    } else if (health > 85){
       healthMod = 2
     }else if (health < 85 && health > 70){
       healthMod = 1.5
@@ -45,16 +45,18 @@ export class Tamagotchi {
 
   restCheck() {
     let rest = this.rest
-    if (rest > 35){
+    if (this.awake == true && rest >25){
       this.awake = true
-    } else{
+    }else if (this.awake == false && rest < 85){
       this.awake = false
+    } else if (rest < 25){
+      this.awake = false
+    } else {
+      this.awake = true
     }
     return this.awake
   }
 
-  level() {
-    }
 
   //returns happiness modifier to metabolism
   happinessCheck() {
@@ -86,7 +88,7 @@ export class Tamagotchi {
       let happy = that.happinessCheck()
       let health = that.healthCheck()
       let rest = that.restCheck()
-      let egg = that.eggCheck(environ)
+      // let egg = that.eggCheck(environ)
 
       if (toEat == true){
         that.eat(environ)
@@ -102,10 +104,13 @@ export class Tamagotchi {
 }
 
  metabolism(environ,happy,health){
-    this.happiness -= happy
-    this.egg += (5 * this.genome[4]) + (happy + health)
-    environ.waste += (20 * this.genome[0])
-    this.rest -= this.genome[5] * 35
+    // this.happiness -= parseFloat(happy.toFixed(0))
+    // this.egg += parseFloat((5 * this.genome[4]) + (happy + health).toFixed(0))
+    // environ.waste += parseFloat((20 * this.genome[0]).toFixed(0))
+    this.rest -= parseFloat((this.genome[5] * 7).toFixed(2))
+    this.hunger += parseFloat((3 * this.genome[2]).toFixed(2))
+    this.health -= parseFloat(1.1 * this.genome[0].toFixed(2))
+    console.log("this.health: " + parseFloat(this.genome[0].toFixed(2)))
   }
 
 
@@ -117,15 +122,23 @@ export class Tamagotchi {
       mealSize = foodAvail
     } else {
     mealSize = foodNeed
-    let eats = Math.floor((Math.random() * mealSize) + 1)
+    let eats = parseFloat((Math.random() * mealSize).toFixed(2))
     environ.food -= eats
-    this.hunger += eats * (100/mealSize)
+    environ.waste += eats * this.genome[0]
+    console.log("poop : " + eats * this.genome[0])
+    this.hunger -= parseFloat(((5 + this.genome[5])*eats).toFixed(2))
     }
   }
 
  sleep(){
-    this.hunger -= this.genome[3]
-    this.rest += 25 * this.genome[5]
+    this.hunger += this.genome[2]
+    this.rest += parseFloat((25 * this.genome[5]).toFixed(2))
+    if (this.health >= 100){
+      this.health += 0;
+    }else{
+      this.health += parseFloat(((this.health / 25) * this.genome[0]).toFixed(2))
+    }
+    console.log(parseFloat(((this.health / 20) * this.genome[0]).toFixed(2)))
   }
 
 }
