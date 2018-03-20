@@ -14,9 +14,9 @@ export function gestate(name){
   newTama.genome = genome;
   return newTama;
 }
-
-  function masterCheck(tamagotchi, environs){
-    setInterval(function() {
-      tamagotchi.metabolismCheck(environs)
-  }, 30000);
-}
+//
+//   function masterCheck(tamagotchi, environs){
+//     setInterval(function() {
+//       tamagotchi.metabolismCheck(environs)
+//   }, 30000);
+// }

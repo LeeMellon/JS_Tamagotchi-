@@ -14,8 +14,8 @@ export class Tamagotchi {
 
 
   // returns bool if needs to eat
-  hungerCheck(){
-    if(this.hunger > 50){
+  hungerCheck(environ){
+    if(this.hunger > 50 && environ.food > 0){
       return true
     } else {
       return false
@@ -67,9 +67,9 @@ export class Tamagotchi {
     } else if (happy < 75 && happy > 50){
       happinessMod = (happy/10) * this.genome[1]
     } else if (happy < 50 && happy > 35){
-      happinessMod = ((happy/7) * this.genome[1]) + 1
+      happinessMod = this.genome[1]
     }else {
-      happinessMod = (happy) * this.genome[1] +1
+      happinessMod = -1
     }
     return happinessMod
   }
@@ -81,21 +81,45 @@ export class Tamagotchi {
      }
   }
 
+  starvationCheck(){
+    let starvation  = false
+    if (this.hunger > 90){
+      starvation = true
+    }
+    return starvation
+  }
+
+  lifeCheck(){
+    let life = true
+    if(this.health <= 0){
+      life = false
+    }
+    return life
+  }
+
+
   metabolismCheck(environ) {
     let that = this
     setInterval(function() {
-      let toEat = that.hungerCheck()
+      let toEat = that.hungerCheck(environ)
       let happy = that.happinessCheck()
       let health = that.healthCheck()
       let rest = that.restCheck()
-      // let egg = that.eggCheck(environ)
+      let egg = that.eggCheck(environ)
+      let starvation = that.starvationCheck()
+      let life = that.lifeCheck()
 
       if (toEat == true){
         that.eat(environ)
         console.log("eat")
+      }else if (life == false){
+        that.death()
       }else if (rest == false){
         that.sleep()
         console.log("sleep")
+      }else if (starvation == true){
+        that.starvation()
+        console.log("starvation")
       } else {
         that.metabolism(environ, happy, health)
         console.log("met")
@@ -104,16 +128,17 @@ export class Tamagotchi {
 }
 
  metabolism(environ,happy,health){
-    // this.happiness -= parseFloat(happy.toFixed(0))
-    // this.egg += parseFloat((5 * this.genome[4]) + (happy + health).toFixed(0))
-    // environ.waste += parseFloat((20 * this.genome[0]).toFixed(0))
+    this.happiness -= (happy * this.genome[1])
+    this.egg += parseFloat((5 * this.genome[4]) + (happy + health).toFixed(2))
     this.rest -= parseFloat((this.genome[5] * 7).toFixed(2))
-    this.hunger += parseFloat((3 * this.genome[2]).toFixed(2))
+    this.hunger +=parseFloat((3 * this.genome[2]).toFixed(2))
     this.health -= parseFloat(1.1 * this.genome[0].toFixed(2))
-    console.log("this.health: " + parseFloat(this.genome[0].toFixed(2)))
+    // this.level += parseFloat((this.genome[3]/1000).toFixed(4))
+    // console.log((this.genome[3]/1000).toFixed(4))
   }
 
 
+//eating process
  eat(environ){
     let foodNeed = this.level * 5
     let foodAvail = environ.food
@@ -121,15 +146,16 @@ export class Tamagotchi {
     if (foodNeed > foodAvail){
       mealSize = foodAvail
     } else {
-    mealSize = foodNeed
+      mealSize = foodNeed
+    }
     let eats = parseFloat((Math.random() * mealSize).toFixed(2))
-    environ.food -= eats
+    environ.food -= mealSize
     environ.waste += eats * this.genome[0]
-    console.log("poop : " + eats * this.genome[0])
     this.hunger -= parseFloat(((5 + this.genome[5])*eats).toFixed(2))
     }
-  }
 
+
+//sleep metabolism
  sleep(){
     this.hunger += this.genome[2]
     this.rest += parseFloat((25 * this.genome[5]).toFixed(2))
@@ -138,7 +164,35 @@ export class Tamagotchi {
     }else{
       this.health += parseFloat(((this.health / 25) * this.genome[0]).toFixed(2))
     }
-    console.log(parseFloat(((this.health / 20) * this.genome[0]).toFixed(2)))
+  }
+
+  starvation(){
+    this.hunger += this.genome[2] * 3
+    this.rest -= parseFloat((25 * this.genome[5]).toFixed(2))
+    this.happy -= parseFloat( 2 * (this.happy * this.genome[1]).toFixed(2))
+    this.health -= parseFloat((this.hunger * this.genome[0]).toFixed(2))
+    this.egg += 0
+    this.level += 0
+  }
+
+playWith(){
+  this.hunger += parseFloat(((100 * this.genome[2]) * this.level).toFixed(2))
+    this.rest -= parseFloat((100 * this.genome[5]).toFixed(2))
+    this.happy += parseFloat( 2 * (this.happiness * this.genome[1]).toFixed(2))
+    this.health += parseFloat((this.hunger * this.genome[0]).toFixed(2))
+    this.level += parseFloat(((this.level/2) * this.genome[3]).toFixed(2))
+}
+
+  death(){
+    let name = this.name
+    let condolence = " ${name} has died. You're really not good at being a Tamagotchi owner."
+    //add some continuation method
+    return condolence
+  }
+
+  hex() {
+    let hex = (this.genome[0]).toString().charAt(2) + "f" + (this.genome[2]).toString().charAt(2) + "f" + (this.genome[4]).toString().charAt(2) + "f"
+    return hex
   }
 
 }
